@@ -70,7 +70,6 @@ function sendData()
   t2 = (lasttemp >= 0 and lasttemp % 10000) or (10000 - lasttemp % 10000)
   print("Temp:"..t1 .. "."..string.format("%01d", t2).." C\n")
   print("Sending data to apilio.com")
-  apikey = "yourapikey"
   url = "https://apilio.herokuapp.com/string_variables/thermostat_temperature/set_value/with_key/" .. apikey .. "?value=" .. t1 .. "." .. string.format("%04d", t2)
   http.get(url, nil, function(code, data)
       if (code < 0) then
