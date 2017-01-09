@@ -3,7 +3,7 @@
 --- Tem sensor DS18B20 is conntected to GPIO0
 --- 2015.01.21 sza2 temperature value concatenation bug correction
 
-pin = 4
+pin = 1
 ow.setup(pin)
 
 counter=0
