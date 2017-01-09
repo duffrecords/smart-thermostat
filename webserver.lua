@@ -6,7 +6,7 @@
 
 -- 1:set variables and initial GPIO states
 led1 = 0
-heatsetpoint = 75
+heatsetpoint = 25
 gpio.mode(led1,gpio.OUTPUT)
 gpio.write(led1,gpio.LOW)
 
