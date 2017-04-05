@@ -32,8 +32,8 @@ tmr.create():alarm(1000, tmr.ALARM_AUTO, function(cb_timer)
     else
         cb_timer:unregister()
         print("WiFi connection established, IP address: " .. wifi.sta.getip())
-        print("You have 3 seconds to abort")
+        print("You have 5 seconds to abort")
         print("Waiting...")
-        tmr.create():alarm(3000, tmr.ALARM_SINGLE, startup)
+        tmr.create():alarm(5000, tmr.ALARM_SINGLE, startup)
     end
 end)

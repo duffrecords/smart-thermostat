@@ -94,10 +94,12 @@ function sendData()
   gpio.mode(0,gpio.OUTPUT)
   if (t1 < heatsetpoint) then
     if (home) then
+      print("Turning heater on")
       gpio.write(0,gpio.HIGH)
       metrics_db_body = "devices,device=living-tstat status=1"
     end
   else
+    print("Turning heater off")
     gpio.write(0,gpio.LOW)
     metrics_db_body = "devices,device=living-tstat status=0"
   end
