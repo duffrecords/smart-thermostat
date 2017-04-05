@@ -117,12 +117,13 @@ end
 
 -- send data every X ms to thing speak
 -- tmr.alarm(0, 60000, 1, function() sendData() end )
-tmr.create():alarm(60000, tmr.ALARM_AUTO, function(cb_timer_tstat)
+tstat_timer = tmr.create()
+tstat_timer:alarm(60000, tmr.ALARM_AUTO, function(cb_timer)
   if panic == false then
     sendData()
   else
     print("Received panic command. Stopping heater control sequence.")
-    cb_timer_tstat:unregister()
+    cb_timer:unregister()
     print("Shutting off heater.")
     gpio.mode(relaypin,gpio.OUTPUT)
     gpio.write(relaypin,gpio.LOW)
