@@ -8,6 +8,7 @@ ow.setup(pin)
 
 counter=0
 lasttemp=-999
+home=false
 
 function bxor(a,b)
    local r = 0
@@ -70,20 +71,42 @@ function sendData()
   t2 = (lasttemp >= 0 and lasttemp % 10000) or (10000 - lasttemp % 10000)
   print("Temp:"..t1 .. "."..string.format("%01d", t2).." C\n")
   -- print("Sending data to apilio.com")
-  url = "https://apilio.herokuapp.com/string_variables/thermostat_temperature/set_value/with_key/" .. apikey .. "?value=" .. t1 .. "." .. string.format("%04d", t2)
-  -- http.get(url, nil, function(code, data)
-      -- if (code < 0) then
-          -- print("HTTP request failed")
-      -- else
-          -- print(code, data)
-      -- end
-  -- end)
+  -- url = "https://apilio.herokuapp.com/string_variables/thermostat_temperature/set_value/with_key/" .. apikey .. "?value=" .. t1 .. "." .. string.format("%04d", t2)
+  full_temp = t1 .. "." .. string.format("%01d", t2)
+  metrics_db_body = "temperatures,location=living-tstat temp=" .. full_temp
+  print(metrics_db_url)
+  print(metrics_db_headers)
+  print(metrics_db_body)
+  http.post(metrics_db_url,
+    metrics_db_headers,
+    metrics_db_body,
+    function(code, data)
+      if (code < 0) then
+        print("HTTP request failed")
+      else
+        print(code, data)
+      end
+    end)
   gpio.mode(0,gpio.OUTPUT)
   if (t1 < heatsetpoint) then
-    gpio.write(0,gpio.HIGH)
+    if (home) then
+      gpio.write(0,gpio.HIGH)
+      metrics_db_body = "devices,device=living-tstat status=1"
+    end
   else
     gpio.write(0,gpio.LOW)
+    metrics_db_body = "devices,device=living-tstat status=0"
   end
+  http.post(metrics_db_url,
+    metrics_db_headers,
+    metrics_db_body,
+    function(code, data)
+      if (code < 0) then
+        print("HTTP request failed")
+      else
+        print(code, data)
+      end
+    end)
 end
 
 -- send data every X ms to thing speak
