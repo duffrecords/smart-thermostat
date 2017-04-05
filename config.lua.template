@@ -1,3 +1,8 @@
 ssid = "ssid"
 password = "password"
 apikey = "apikey"
+metrics_db_url = "http://ipaddress:port/write?db=dbname&u=dbuser&p=dbpass"
+metrics_db_headers = "Content-Type: application/json\r\n"
+metrics_db_collection = "temperatures"
+metrics_db_location = "room-name"
+metrics_db_body = "temperatures,location=room-name temp="

@@ -3,6 +3,8 @@
 --- Tem sensor DS18B20 is conntected to GPIO0
 --- 2015.01.21 sza2 temperature value concatenation bug correction
 
+panic = false
+relaypin = 0
 pin = 1
 ow.setup(pin)
 
@@ -22,12 +24,12 @@ function bxor(a,b)
    return r
 end
 
---- Get temperature from DS18B20 
+--- Get temperature from DS18B20
 function getTemp()
       addr = ow.reset_search(pin)
       repeat
         tmr.wdclr()
-      
+
       if (addr ~= nil) then
         crc = ow.crc8(string.sub(addr,1,7))
         if (crc == addr:byte(8)) then
@@ -54,7 +56,7 @@ function getTemp()
          t = t * 625
                    lasttemp = t
          print("Last temp: " .. lasttemp)
-                end                   
+                end
                 tmr.wdclr()
           end
         end
@@ -87,6 +89,8 @@ function sendData()
         print(code, data)
       end
     end)
+
+  --- operate the relay that controls the thermostat
   gpio.mode(0,gpio.OUTPUT)
   if (t1 < heatsetpoint) then
     if (home) then
@@ -97,6 +101,8 @@ function sendData()
     gpio.write(0,gpio.LOW)
     metrics_db_body = "devices,device=living-tstat status=0"
   end
+
+  --- send metrics
   http.post(metrics_db_url,
     metrics_db_headers,
     metrics_db_body,
@@ -110,4 +116,15 @@ function sendData()
 end
 
 -- send data every X ms to thing speak
-tmr.alarm(0, 60000, 1, function() sendData() end )
+-- tmr.alarm(0, 60000, 1, function() sendData() end )
+tmr.create():alarm(60000, tmr.ALARM_AUTO, function(cb_timer_tstat)
+  if panic == false then
+    sendData()
+  else
+    print("Received panic command. Stopping heater control sequence.")
+    cb_timer_tstat:unregister()
+    print("Shutting off heater.")
+    gpio.mode(relaypin,gpio.OUTPUT)
+    gpio.write(relaypin,gpio.LOW)
+  end
+end)

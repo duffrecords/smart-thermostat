@@ -11,6 +11,7 @@ t1 = 25
 t2 = 0
 gpio.mode(relaypin,gpio.OUTPUT)
 gpio.write(relaypin,gpio.LOW)
+panic = false
 
 -- 2:check whether server is already started
 if srv~=nil then
@@ -39,7 +40,9 @@ srv:listen(80,function(conn)
     end
 
     -- 7:the actions
-    if (_GET.pin=="L1On") then
+    if (_GET.panic=="true") then
+      panic = true
+    elseif (_GET.pin=="L1On") then
       gpio.write(relaypin,gpio.HIGH)
     elseif (_GET.pin=="L1Off") then
       gpio.write(relaypin,gpio.LOW)
@@ -82,6 +85,7 @@ srv:listen(80,function(conn)
       mode = 'Away'
     end
     buf = buf.."<p>Heating Mode: "..mode.."</p>";
+    buf = buf.."<p><a href=\"?panic=true\"><button style=\"color:#ff0000\">PANIC</button></a></p>";
 
     -- 8:send the data and close the connection
     if (apibuf=="") then
