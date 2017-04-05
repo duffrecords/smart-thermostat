@@ -15,7 +15,9 @@ function startup()
         file.close("init.lua")
         -- the actual application is stored in 'application.lua'
         -- dofile("application.lua")
+        print("Starting web server")
         dofile("webserver.lua")
+        print("Starting thermostat sequence")
         dofile("ds18b20.lua")
     end
 end
