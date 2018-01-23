@@ -71,6 +71,11 @@ srv:listen(80,function(conn)
     end
 
     -- 6:the webpage
+    buf = buf.."<!DOCTYPE HTML>";
+    buf = buf.."<html>";
+    buf = buf.."<head><meta  content=\"text/html; charset=utf-8\">";
+    buf = buf.."<title>ESP8266 Thermostat</title></head>";
+    buf = buf.."<body>";
     buf = buf.."<h1> ESP8266 Smart Thermostat</h1>";
     if (gpio.read(relaypin)==0) then
       buf = buf.."<p>Contact Closure: <a href=\"?pin=L1On\"><button>ON</button></a>&nbsp;<a href=\"?pin=L1Off\"><button style=\"color:#0099ff\">OFF</button></a></p>";
@@ -86,12 +91,13 @@ srv:listen(80,function(conn)
     end
     buf = buf.."<p>Heating Mode: "..mode.."</p>";
     buf = buf.."<p><a href=\"?panic=true\"><button style=\"color:#ff0000\">PANIC</button></a></p>";
+    buf = buf.."</body></html>"
 
     -- 8:send the data and close the connection
     if (apibuf=="") then
-      cn:send(buf)
+      cn:send("HTTP/1.1 200 OK\n\n" .. buf .. "\r\n\r\n")
     else
-      cn:send(apibuf)
+      cn:send("HTTP/1.1 200 OK\n\n" .. apibuf .. "\r\n\r\n")
     end
     cn:close()
     collectgarbage()
